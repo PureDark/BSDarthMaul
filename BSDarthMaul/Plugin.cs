@@ -18,7 +18,7 @@ namespace BSDarthMaul
 	public class Plugin : IEnhancedPlugin, IPlugin
 	{
         public static string PluginName = "Darth Maul Plugin";
-        public const string VersionNum = "0.2.0";
+        public const string VersionNum = "0.2.1";
 
         private static Plugin _instance;
 
@@ -27,6 +27,8 @@ namespace BSDarthMaul
         private static GameOptionToggle oneHandedToggle;
 
         public static Dictionary<string, Sprite> Icons = new Dictionary<string, Sprite>();
+
+        private static AsyncScenesLoader loader;
 
         public const string KeyDarthMode = "DMDarthMode";
         public const string KeyOneHanded = "DMOneHanded";
@@ -124,20 +126,27 @@ namespace BSDarthMaul
 		{
             try
             {
-                if (scene.buildIndex == 1)
+                if (scene.name == "Menu")
                 {
                     GetBeatSaberIcons();
                     AddModMenuButton();
                 }
-                if (scene.buildIndex == 5)
+                else if (scene.name == "StandardLevelLoader")
                 {
-                    this.darthMaulBehavior = new GameObject("DarthMaulBehavior").AddComponent<DarthMaulBehavior>();
+                    if (!loader)
+                        loader = Resources.FindObjectsOfTypeAll<AsyncScenesLoader>().FirstOrDefault();
+                    loader.loadingDidFinishEvent += OnLoadingDidFinishGame;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
             }
+        }
+
+        public void OnLoadingDidFinishGame()
+        {
+            this.darthMaulBehavior = new GameObject("DarthMaulBehavior").AddComponent<DarthMaulBehavior>();
         }
 
         private void CheckForUserDataFolder()
@@ -184,8 +193,9 @@ namespace BSDarthMaul
             MainMenuViewController _mainMenuViewController = Resources.FindObjectsOfTypeAll<MainMenuViewController>().First();
             GameplayOptionsViewController _gameplayOptionsViewController = Resources.FindObjectsOfTypeAll<GameplayOptionsViewController>().First();
             _gameplayOptionsViewController.transform.Find("InfoText").gameObject.SetActive(false);
-            RectTransform container = (RectTransform)_gameplayOptionsViewController.transform.Find("Container");
-            //Console.WriteLine("container.sizeDelta.x : " + container.sizeDelta.x + " container.sizeDelta.y : " + container.sizeDelta.y);
+            RectTransform container = (RectTransform)_gameplayOptionsViewController.transform.Find("Switches").Find("Container");
+            //DumpChildren(_gameplayOptionsViewController.transform);
+            Console.WriteLine("container.sizeDelta.x : " + container.sizeDelta.x + " container.sizeDelta.y : " + container.sizeDelta.y);
             container.sizeDelta = new Vector2(container.sizeDelta.x, container.sizeDelta.y + 14f);
             container.Translate(new Vector3(0, -0.1f, 0));
             Transform noEnergy = container.Find("NoEnergy");
@@ -193,6 +203,19 @@ namespace BSDarthMaul
             bool IsOneHanded = ModPrefs.GetBool(PluginName, KeyOneHanded, false);
             darthModeToggle = new GameOptionToggle(container.gameObject, noEnergy.gameObject, KeyDarthMode, Icons["NoteCutInfoIcon"], "DMaul Mode", IsDarthModeOn);
             oneHandedToggle = new GameOptionToggle(container.gameObject, noEnergy.gameObject, KeyOneHanded, Icons["SingleSaberIcon"], "OneHanded", IsOneHanded);
+        }
+
+        //for dumping purposes
+        private void DumpChildren(Transform parent)
+        {
+            foreach(Transform child in parent.GetComponentsInChildren<Transform>())
+            {
+                Console.WriteLine("Child.name: " + child.name + " parent: " + child.parent.name);
+                if(child.name == "Container")
+                {
+                    Console.WriteLine(child);
+                }
+            }
         }
 
         public static void ToggleDarthMode()

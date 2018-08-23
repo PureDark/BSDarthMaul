@@ -19,6 +19,7 @@ namespace BSDarthMaul
         {
             try
             {
+                Console.WriteLine("Darth Maul Loaded");
                 this._playerController = FindObjectOfType<PlayerController>();
                 this._head = ReflectionUtil.GetPrivateField<Transform>(_playerController, "_headTransform");
                 this.separation = Plugin.Separation;
@@ -38,7 +39,7 @@ namespace BSDarthMaul
                     return;
                 }
 
-                if (Plugin.IsAutoDetect)
+                if (Plugin.IsAutoDetect && (Input.GetKey((KeyCode)ConInput.Vive.LeftTrigger) || Input.GetKey((KeyCode)ConInput.Vive.RightTrigger)))
                 {
                     Vector3 leftHandPos = InputTracking.GetLocalPosition(XRNode.LeftHand);
                     Vector3 rightHandPos = InputTracking.GetLocalPosition(XRNode.RightHand);
@@ -93,7 +94,7 @@ namespace BSDarthMaul
                         _playerController.leftSaber.transform.parent.transform.localPosition = _playerController.rightSaber.transform.parent.transform.localPosition;
                         _playerController.leftSaber.transform.parent.transform.localRotation = _playerController.rightSaber.transform.parent.transform.localRotation;
                         _playerController.leftSaber.transform.parent.transform.Rotate(0, 180, 180);
-                        _playerController.leftSaber.transform.parent.transform.Translate(new Vector3(0, 0, sep * 2));
+                        _playerController.leftSaber.transform.parent.transform.Translate(0, 0, sep * 2, Space.Self);
                     }
                     else
                     {
