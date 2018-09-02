@@ -1,4 +1,4 @@
-# Darth Maul Plugin v0.3.0
+# Darth Maul Plugin v0.3.2
 
 * Darth Maul mode
 * One controller support

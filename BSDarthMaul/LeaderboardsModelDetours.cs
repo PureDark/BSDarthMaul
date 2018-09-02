@@ -59,9 +59,11 @@ namespace BSDarthMaul
             if (isHMMod)
                 leaderboardID += "HM";
             if (Plugin.IsDarthModeOn)
+            {
                 leaderboardID += "DM";
-            if (Plugin.IsOneHanded)
-                leaderboardID += "OH";
+                if (Plugin.IsOneHanded)
+                    leaderboardID += "OH";
+            }
             return leaderboardID;
         }
 
