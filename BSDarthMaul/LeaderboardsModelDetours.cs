@@ -60,6 +60,8 @@ namespace BSDarthMaul
                 leaderboardID += "HM";
             if (Plugin.IsDarthModeOn)
                 leaderboardID += "DM";
+            if (Plugin.IsOneHanded)
+                leaderboardID += "OH";
             return leaderboardID;
         }
 

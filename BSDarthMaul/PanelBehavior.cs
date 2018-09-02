@@ -116,6 +116,7 @@ namespace BSDarthMaul
             darthModeToggle = new GameOptionToggle(container.gameObject, noEnergy.gameObject, Plugin.KeyDarthMode, Icons["NoteCutInfoIcon"], "DMaul Mode", IsDarthModeOn);
             oneHandedToggle = new GameOptionToggle(container.gameObject, noEnergy.gameObject, Plugin.KeyOneHanded, Icons["SingleSaberIcon"], "DM Onehanded", IsOneHanded);
             darthModeToggle.OnToggle += OnDarthMualModeToggle;
+            oneHandedToggle.OnToggle += OnOneHandedToggle;
         }
 
         
@@ -134,6 +135,12 @@ namespace BSDarthMaul
         void OnDarthMualModeToggle(bool isOn)
         {
             CheckForDarthModeLeaderBoard();
+        }
+
+        void OnOneHandedToggle(bool isOn)
+        {
+            if(Plugin.IsDarthModeOn)
+                CheckForDarthModeLeaderBoard();
         }
 
         private void CheckForDarthModeLeaderBoard()
