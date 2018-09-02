@@ -20,6 +20,8 @@ namespace BSDarthMaul.Components
 
         private string _prefKey;
 
+        public event Action<bool> OnToggle;
+
         internal string NameText
         {
             get
@@ -58,6 +60,7 @@ namespace BSDarthMaul.Components
         {
             this.Value = isOn;
             ModPrefs.SetBool(Plugin.PluginName, _prefKey, isOn);
+            OnToggle?.Invoke(isOn);
         }
         
     }

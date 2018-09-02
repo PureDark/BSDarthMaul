@@ -7,13 +7,17 @@ namespace BSDarthMaul
     public class DarthMaulBehavior : MonoBehaviour
     {
         private PlayerController _playerController;
+        private MainGameSceneSetupData _mainGameSceneSetupData;
 
         private Transform _head;
         private Vector3 lastLeftPos = new Vector3(0, 0, 0);
         private Vector3 lastRightPos = new Vector3(0, 0, 0);
         private float toggleHoldTime;
-        private int separation = 0;
+
+        private bool isDarthModeOn = false;
+        private bool isOneHanded = false;
         private bool isAutoDetect = false;
+        private int separation = 0;
 
         private void Start()
         {
@@ -22,8 +26,24 @@ namespace BSDarthMaul
                 Console.WriteLine("Darth Maul Loaded");
                 this._playerController = FindObjectOfType<PlayerController>();
                 this._head = ReflectionUtil.GetPrivateField<Transform>(_playerController, "_headTransform");
-                this.separation = Plugin.Separation;
+                this.isDarthModeOn = Plugin.IsDarthModeOn;
+                this.isOneHanded = Plugin.IsOneHanded;
                 this.isAutoDetect = Plugin.IsAutoDetect;
+                this.separation = Plugin.Separation;
+
+                var _mainGameSceneSetup = FindObjectOfType<MainGameSceneSetup>();
+                _mainGameSceneSetupData = ReflectionUtil.GetPrivateField<MainGameSceneSetupData>(_mainGameSceneSetup, "_mainGameSceneSetupData");
+
+                if (Plugin.IsDarthModeOn && _mainGameSceneSetupData.gameplayMode == GameplayMode.SoloNoArrows)
+                {
+                    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(_mainGameSceneSetup, "_beatmapDataModel");
+                    var beatmapData = CreateTransformedBeatmapData(_mainGameSceneSetupData.difficultyLevel.beatmapData, _mainGameSceneSetupData.gameplayOptions, _mainGameSceneSetupData.gameplayMode);
+                    if (beatmapData != null)
+                    {
+                        _beatmapDataModel.beatmapData = beatmapData;
+                        ReflectionUtil.SetPrivateField(_mainGameSceneSetup, "_beatmapDataModel", _beatmapDataModel);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -39,7 +59,8 @@ namespace BSDarthMaul
                     return;
                 }
 
-                if (Plugin.IsAutoDetect && (Input.GetKey((KeyCode)ConInput.Vive.LeftTrigger) || Input.GetKey((KeyCode)ConInput.Vive.RightTrigger)))
+                if (isAutoDetect && !_mainGameSceneSetupData.gameplayOptions.validForScoreUse 
+                    && (Input.GetKey((KeyCode)ConInput.Vive.LeftTrigger) || Input.GetKey((KeyCode)ConInput.Vive.RightTrigger)))
                 {
                     Vector3 leftHandPos = InputTracking.GetLocalPosition(XRNode.LeftHand);
                     Vector3 rightHandPos = InputTracking.GetLocalPosition(XRNode.RightHand);
@@ -59,15 +80,15 @@ namespace BSDarthMaul
                     float angle = Vector3.Angle(leftForward, rightForward);
                     float distance = Vector3.Distance(leftHandPos, rightHandPos);
 
-                    if (Plugin.IsDarthModeOn && angle > 90 && distance > 1.0f)
+                    if (isDarthModeOn && angle > 90 && distance > 1.0f)
                     {
                         if (leftPointing < 0 && rightPointing > 0 && leftVelocity > 3.5f && rightVelocity > 3.5f)
                         {
                             toggleHoldTime = 0;
-                            Plugin.ToggleDarthMode(false);
+                            ToggleDarthMode(false);
                         }
                     }
-                    else if (!Plugin.IsDarthModeOn && angle > 150 && distance < 0.5f)
+                    else if (!isDarthModeOn && angle > 150 && distance < 0.5f)
                     {
                         if (leftPointing < 0 && rightPointing > 0)
                         {
@@ -75,7 +96,7 @@ namespace BSDarthMaul
                             if (toggleHoldTime > 0.75f * distance)
                             {
                                 toggleHoldTime = 0;
-                                Plugin.ToggleDarthMode(true);
+                                ToggleDarthMode(true);
                             }
                         }
                     }
@@ -85,11 +106,11 @@ namespace BSDarthMaul
                     }
                 }
 
-                if (Plugin.IsDarthModeOn)
+                if (isDarthModeOn)
                 {
 
                     float sep = 1f * separation / 100;
-                    if (Plugin.IsOneHanded)
+                    if (isOneHanded)
                     {
                         _playerController.leftSaber.transform.parent.transform.localPosition = _playerController.rightSaber.transform.parent.transform.localPosition;
                         _playerController.leftSaber.transform.parent.transform.localRotation = _playerController.rightSaber.transform.parent.transform.localRotation;
@@ -115,17 +136,41 @@ namespace BSDarthMaul
             }
         }
 
-
+        public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, GameplayOptions gameplayOptions, GameplayMode gameplayMode)
+        {
+            BeatmapData beatmapData2 = beatmapData;
+            if (gameplayOptions.mirror)
+            {
+                beatmapData2 = BeatDataMirrorTransform.CreateTransformedData(beatmapData2);
+            }
+            if (gameplayMode == GameplayMode.SoloNoArrows)
+            {
+                beatmapData2 = BeatmapDataNoArrowsTransform.CreateTransformedData(beatmapData2);
+            }
+            if (gameplayOptions.obstaclesOption != GameplayOptions.ObstaclesOption.All)
+            {
+                beatmapData2 = BeatmapDataObstaclesTransform.CreateTransformedData(beatmapData2, gameplayOptions.obstaclesOption);
+            }
+            if (beatmapData2 == beatmapData)
+            {
+                beatmapData2 = beatmapData.GetCopy();
+            }
+            if (gameplayOptions.staticLights)
+            {
+                BeatmapEventData[] beatmapEventData = new BeatmapEventData[]
+                {
+                new BeatmapEventData(0f, BeatmapEventType.Event0, 1),
+                new BeatmapEventData(0f, BeatmapEventType.Event4, 1)
+                };
+                beatmapData2 = new BeatmapData(beatmapData2.beatmapLinesData, beatmapEventData);
+            }
+            return beatmapData2;
+        }
 
         public void ToggleDarthMode()
         {
             Plugin.IsDarthModeOn = !Plugin.IsDarthModeOn;
-            //Vector3 leftHandPos = InputTracking.GetLocalPosition(XRNode.LeftHand);
-            //Vector3 rightHandPos = InputTracking.GetLocalPosition(XRNode.RightHand);
-            //Quaternion leftHandRotation = InputTracking.GetLocalRotation(XRNode.LeftHand);
-            //Quaternion rightHandRotation = InputTracking.GetLocalRotation(XRNode.RightHand);
-            //_playerController.leftSaber.transform.SetPositionAndRotation(leftHandPos, leftHandRotation);
-            //_playerController.rightSaber.transform.SetPositionAndRotation(rightHandPos, rightHandRotation);
+            isDarthModeOn = Plugin.IsDarthModeOn;
         }
 
         public void ToggleDarthMode(bool enable)
@@ -139,9 +184,7 @@ namespace BSDarthMaul
         public void ToggleOneHanded()
         {
             Plugin.IsOneHanded = !Plugin.IsOneHanded;
-            //Vector3 rightHandPos = InputTracking.GetLocalPosition(XRNode.RightHand);
-            //Quaternion rightHandRotation = InputTracking.GetLocalRotation(XRNode.RightHand);
-            //_playerController.rightSaber.transform.SetPositionAndRotation(rightHandPos, rightHandRotation);
+            isOneHanded = Plugin.IsOneHanded;
         }
 
         public void ToggleOneHanded(bool enable)
