@@ -1,4 +1,4 @@
-# Darth Maul Plugin v0.3.0
+# Darth Maul Plugin v0.3.1
 
 * Darth Maul mode
 * One controller support
@@ -19,7 +19,7 @@ DMAutoDetect=0
 ```
 
 # Leaderboards
-Turnning on Darh Maul Mode results in a separated leaderboard.
+Turnning on Darh Maul Mode results in a separated leaderboard. 1 hand & 2 hand mode will have different leaderboards .
 
 AutoDetect now only works in no-fail/party mode for this particular reason.
 
