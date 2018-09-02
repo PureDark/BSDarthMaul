@@ -19,7 +19,7 @@ DMAutoDetect=0
 ```
 
 # Leaderboards
-Turnning on Darh Maul Mode resulting in a separated leaderboard.
+Turnning on Darh Maul Mode results in a separated leaderboard.
 
 AutoDetect now only works in no-fail/party mode for this particular reason.
 
@@ -29,5 +29,5 @@ It's compatible with HiddenBlocks, meaning
 * DarhMaulMode and HiddenBlocks both on yet another brand-new leaderboard.
 
 
-# Source Code
-[Github Link](https://github.com/PureDark/BSDarthMaul/)
+# Downloads
+[ModSaber](https://www.modsaber.ml/mod/darthmaul/0.3.0)
