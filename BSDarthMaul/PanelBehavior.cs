@@ -89,15 +89,23 @@ namespace BSDarthMaul
 
         private void GetBeatSaberIcons()
         {
-            if (Icons.Count > 0)
+            try
             {
-                return;
+                if (Icons.Count > 0)
+                {
+                    return;
+                }
+                Sprite[] array = Resources.FindObjectsOfTypeAll<Sprite>();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    Sprite item = array[i];
+                    if (!Icons.ContainsKey(item.name))
+                        Icons.Add(item.name, item);
+                }
             }
-            Sprite[] array = Resources.FindObjectsOfTypeAll<Sprite>();
-            for (int i = 0; i < array.Length; i++)
+            catch (Exception ex)
             {
-                Sprite item = array[i];
-                Icons.Add(item.name, item);
+                Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
             }
         }
 

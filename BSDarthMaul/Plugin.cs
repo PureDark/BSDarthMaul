@@ -10,7 +10,7 @@ namespace BSDarthMaul
 	public class Plugin : IEnhancedPlugin, IPlugin
 	{
         public static string PluginName = "Darth Maul Plugin";
-        public const string VersionNum = "0.3.2";
+        public const string VersionNum = "0.3.3";
 
         public string Name => PluginName;
         public string Version => VersionNum;
