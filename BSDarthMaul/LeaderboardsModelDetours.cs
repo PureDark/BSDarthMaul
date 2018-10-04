@@ -57,7 +57,7 @@ namespace BSDarthMaul
             text2
             });
             if (isHMMod)
-                leaderboardID += "HM";
+                leaderboardID += "HD";
             if (Plugin.IsDarthModeOn)
             {
                 leaderboardID += "DM";
