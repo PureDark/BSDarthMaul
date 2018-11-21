@@ -165,24 +165,6 @@ namespace BSDarthMaul
                 
                 var levels = _levelCollectionsForGameplayModes.GetLevels(mode);
 
-                /****Doesn't work, abandoned.****/
-                /*if (Plugin.IsDarthModeOn)
-                {
-                    foreach (IStandardLevel level in levels)
-                    {
-                        if(!level.levelID.Contains("DarthMaulMode"))
-                            level.SetPrivateField("_levelID", level.levelID + "DarthMaulMode");
-                    }
-                }
-                else
-                {
-                    foreach (IStandardLevel level in levels)
-                    {
-                        if (level.levelID.Contains("DarthMaulMode"))
-                            level.SetPrivateField("_levelID", StringReplace(level.levelID, "DarthMaulMode", ""));
-                    }
-                }*/
-
                 _levelSelectionNavigationController.DismissModalViewController(null, true);
                 _levelSelectionFlowCoordinator.Present(_soloModeSelectionViewController, levels, mode);
 

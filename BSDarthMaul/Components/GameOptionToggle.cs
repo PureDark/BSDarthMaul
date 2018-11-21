@@ -48,7 +48,7 @@ namespace BSDarthMaul.Components
             this._toggle.didSwitchEvent += new Action<HMUI.Toggle, bool>(this.HandleNoEnergyToggleDidSwitch);
             foreach (MonoBehaviour obj in gameObject.GetComponentsInChildren<UnityEngine.UI.Image>())
             {
-                if ("Image".Equals(obj.name))
+                if ("Image" == obj.name)
                 {
                     ((UnityEngine.UI.Image)obj).sprite = icon;
                     return;

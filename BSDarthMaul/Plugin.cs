@@ -10,7 +10,7 @@ namespace BSDarthMaul
 	public class Plugin : IEnhancedPlugin, IPlugin
 	{
         public static string PluginName = "Darth Maul Plugin";
-        public const string VersionNum = "0.3.3";
+        public const string VersionNum = "0.4.0";
 
         public string Name => PluginName;
         public string Version => VersionNum;
@@ -24,8 +24,10 @@ namespace BSDarthMaul
 
         public const string KeyDarthMode = "DMDarthMode";
         public const string KeyOneHanded = "DMOneHanded";
+        public const string KeyMainController = "DMMainController";
         public const string KeySeparation = "DMSerparation";
         public const string KeyAutoDetect = "DMAutoDetect";
+        public const string KeyNoArrowRandLv = "DMNoArrowRandLv";
 
         public static bool IsDarthModeOn
         {
@@ -53,6 +55,24 @@ namespace BSDarthMaul
             }
         }
 
+        public enum ControllerType {
+            LEFT,
+            RIGHT
+        }
+
+        public static ControllerType MainController
+        {
+            get
+            {
+                return (ControllerType)ModPrefs.GetInt(PluginName, KeyMainController, 0);
+            }
+
+            set
+            {
+                ModPrefs.SetInt(PluginName, KeyMainController, (int)value);
+            }
+        }
+
         public static bool IsAutoDetect
         {
             get
@@ -76,6 +96,19 @@ namespace BSDarthMaul
             set
             {
                 ModPrefs.SetInt(PluginName, KeySeparation, value);
+            }
+        }
+
+        public static int NoArrowRandLv
+        {
+            get
+            {
+                return ModPrefs.GetInt(Plugin.PluginName, KeyNoArrowRandLv, 2);
+            }
+
+            set
+            {
+                ModPrefs.SetInt(PluginName, KeyNoArrowRandLv, value);
             }
         }
 
@@ -135,6 +168,10 @@ namespace BSDarthMaul
             {
                 ModPrefs.SetBool(PluginName, KeyOneHanded, false);
             }
+            if ("".Equals(ModPrefs.GetString(PluginName, KeyMainController, "")))
+            {
+                ModPrefs.SetInt(PluginName, KeyMainController, 1);
+            }
             if ("".Equals(ModPrefs.GetString(PluginName, KeyAutoDetect, "")))
             {
                 ModPrefs.SetBool(PluginName, KeyAutoDetect, false);
@@ -142,6 +179,10 @@ namespace BSDarthMaul
             if ("".Equals(ModPrefs.GetString(PluginName, KeySeparation, "")))
             {
                 ModPrefs.SetInt(PluginName, KeySeparation, 15);
+            }
+            if ("".Equals(ModPrefs.GetString(PluginName, KeyNoArrowRandLv, "")))
+            {
+                ModPrefs.SetInt(PluginName, KeyNoArrowRandLv, 0);
             }
         }
 

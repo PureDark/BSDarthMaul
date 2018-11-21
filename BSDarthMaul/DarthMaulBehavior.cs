@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR;
+using static BSDarthMaul.Plugin;
 
 namespace BSDarthMaul
 {
@@ -16,6 +17,7 @@ namespace BSDarthMaul
 
         private bool isDarthModeOn = false;
         private bool isOneHanded = false;
+        private ControllerType mainController = ControllerType.RIGHT;
         private bool isAutoDetect = false;
         private int separation = 0;
 
@@ -28,6 +30,7 @@ namespace BSDarthMaul
                 this._head = ReflectionUtil.GetPrivateField<Transform>(_playerController, "_headTransform");
                 this.isDarthModeOn = Plugin.IsDarthModeOn;
                 this.isOneHanded = Plugin.IsOneHanded;
+                this.mainController = Plugin.MainController;
                 this.isAutoDetect = Plugin.IsAutoDetect;
                 this.separation = Plugin.Separation;
 
@@ -112,10 +115,20 @@ namespace BSDarthMaul
                     float sep = 1f * separation / 100;
                     if (isOneHanded)
                     {
-                        _playerController.leftSaber.transform.parent.transform.localPosition = _playerController.rightSaber.transform.parent.transform.localPosition;
-                        _playerController.leftSaber.transform.parent.transform.localRotation = _playerController.rightSaber.transform.parent.transform.localRotation;
-                        _playerController.leftSaber.transform.parent.transform.Rotate(0, 180, 180);
-                        _playerController.leftSaber.transform.parent.transform.Translate(0, 0, sep * 2, Space.Self);
+                        if(mainController == ControllerType.LEFT)
+                        {
+                            _playerController.rightSaber.transform.parent.transform.localPosition = _playerController.leftSaber.transform.parent.transform.localPosition;
+                            _playerController.rightSaber.transform.parent.transform.localRotation = _playerController.leftSaber.transform.parent.transform.localRotation;
+                            _playerController.rightSaber.transform.parent.transform.Rotate(0, 180, 180);
+                            _playerController.rightSaber.transform.parent.transform.Translate(0, 0, sep * 2, Space.Self);
+                        }
+                        else
+                        {
+                            _playerController.leftSaber.transform.parent.transform.localPosition = _playerController.rightSaber.transform.parent.transform.localPosition;
+                            _playerController.leftSaber.transform.parent.transform.localRotation = _playerController.rightSaber.transform.parent.transform.localRotation;
+                            _playerController.leftSaber.transform.parent.transform.Rotate(0, 180, 180);
+                            _playerController.leftSaber.transform.parent.transform.Translate(0, 0, sep * 2, Space.Self);
+                        }
                     }
                     else
                     {

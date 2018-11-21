@@ -6,9 +6,9 @@ namespace BSDarthMaul
 {
     public class LeaderboardsModelDetours
     {
-        private static bool isHMModChecked;
-        private static bool isHMMod;
-        private static IPlugin HMModPlugin;
+        private static bool isHDModChecked;
+        private static bool isHDMod;
+        private static IPlugin HDModPlugin;
 
         public static string GetLeaderboardID(IStandardLevelDifficultyBeatmap difficultyLevel, GameplayMode gameplayMode)
         {
@@ -56,9 +56,9 @@ namespace BSDarthMaul
             "_",
             text2
             });
-            if (isHMMod)
-                leaderboardID += "HM";
-            if (Plugin.IsDarthModeOn)
+            if (isHDMod)
+                leaderboardID += "HD";
+            if (Plugin.IsDarthModeOn && Plugin.NoArrowRandLv == 0)
             {
                 leaderboardID += "DM";
                 if (Plugin.IsOneHanded)
@@ -71,26 +71,26 @@ namespace BSDarthMaul
         {
             try
             {
-                if (isHMModChecked && HMModPlugin == null)
+                if (isHDModChecked && HDModPlugin == null)
                     return;
-                isHMModChecked = true;
+                isHDModChecked = true;
 
-                if (HMModPlugin == null)
+                if (HDModPlugin == null)
                 {
                     foreach (var plugin in IllusionInjector.PluginManager.Plugins)
                     {
                         if (plugin.Name == "HiddenBlocks")
                         {
-                            HMModPlugin = plugin;
+                            HDModPlugin = plugin;
                             break;
                         }
                     }
                 }
                     
-                if (HMModPlugin != null)
+                if (HDModPlugin != null)
                 {
-                    Type type = HMModPlugin.GetType();
-                    isHMMod = (bool)type.GetField("enableHiddenBlocks", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+                    Type type = HDModPlugin.GetType();
+                    isHDMod = (bool)type.GetField("enableHiddenBlocks", BindingFlags.Static | BindingFlags.Public).GetValue(null);
                 }
             }
             catch (Exception ex)

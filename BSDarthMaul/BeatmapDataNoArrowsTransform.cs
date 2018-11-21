@@ -12,6 +12,7 @@ namespace BSDarthMaul
         public static BeatmapData CreateTransformedData(BeatmapData beatmapData)
         {
             bool isDarthModeOn = Plugin.IsDarthModeOn;
+            int randLevel = Plugin.NoArrowRandLv;
             beatmapData = beatmapData.GetCopy();
             BeatmapLineData[] beatmapLinesData = beatmapData.beatmapLinesData;
             int[] array = new int[beatmapLinesData.Length];
@@ -70,7 +71,7 @@ namespace BSDarthMaul
                             if (noteData != null)
                             {
                                 noteData.SetNoteToAnyCutDirection();
-                                if (!isDarthModeOn && num2 <= 2)
+                                if ((isDarthModeOn && num2 <= randLevel) || (!isDarthModeOn && num2 <= 2))
                                 {
                                     noteData.TransformNoteAOrBToRandomType();
                                 }
