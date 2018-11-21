@@ -64,7 +64,7 @@ namespace BSDarthMaul
         {
             get
             {
-                return (ControllerType)ModPrefs.GetInt(PluginName, KeyMainController, 0);
+                return (ControllerType)ModPrefs.GetInt(PluginName, KeyMainController, 1);
             }
 
             set
@@ -103,7 +103,7 @@ namespace BSDarthMaul
         {
             get
             {
-                return ModPrefs.GetInt(Plugin.PluginName, KeyNoArrowRandLv, 2);
+                return ModPrefs.GetInt(Plugin.PluginName, KeyNoArrowRandLv, 0);
             }
 
             set
