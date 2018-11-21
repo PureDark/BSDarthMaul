@@ -72,6 +72,7 @@
     <Compile Include="BSDarthMaul\Components\GameOptionSetting.cs" />
     <Compile Include="BSDarthMaul\Components\GameOptionToggle.cs" />
     <Compile Include="BSDarthMaul\Components\SeparationSettingsController.cs" />
+    <Compile Include="BSDarthMaul\HapticFeedbackControllerDetours.cs" />
     <Compile Include="BSDarthMaul\LeaderboardsModelDetours.cs" />
     <Compile Include="BSDarthMaul\Helpers\HookManager.cs" />
     <Compile Include="BSDarthMaul\PanelBehavior.cs" />

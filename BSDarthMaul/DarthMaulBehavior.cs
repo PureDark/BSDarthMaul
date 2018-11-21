@@ -1,4 +1,8 @@
-﻿using System;
+﻿using PlayHooky;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.XR;
 using static BSDarthMaul.Plugin;
@@ -21,6 +25,8 @@ namespace BSDarthMaul
         private bool isAutoDetect = false;
         private int separation = 0;
 
+        private HapticFeedbackHooks hapticFeedbackHooks;
+
         private void Start()
         {
             try
@@ -33,6 +39,9 @@ namespace BSDarthMaul
                 this.mainController = Plugin.MainController;
                 this.isAutoDetect = Plugin.IsAutoDetect;
                 this.separation = Plugin.Separation;
+
+                hapticFeedbackHooks = new HapticFeedbackHooks();
+                hapticFeedbackHooks.StartHooking();
 
                 var _mainGameSceneSetup = FindObjectOfType<MainGameSceneSetup>();
                 _mainGameSceneSetupData = ReflectionUtil.GetPrivateField<MainGameSceneSetupData>(_mainGameSceneSetup, "_mainGameSceneSetupData");
@@ -149,6 +158,10 @@ namespace BSDarthMaul
             }
         }
 
+        void OnDestroy() {
+            hapticFeedbackHooks.UnHookAll();
+        }
+
         public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, GameplayOptions gameplayOptions, GameplayMode gameplayMode)
         {
             BeatmapData beatmapData2 = beatmapData;
@@ -205,6 +218,57 @@ namespace BSDarthMaul
             if (enable != Plugin.IsOneHanded)
             {
                 ToggleOneHanded();
+            }
+        }
+
+        public class HapticFeedbackHooks 
+        {
+            private HookManager hookManager;
+            private Dictionary<string, MethodInfo> hooks;
+
+            public void StartHooking() 
+            {
+                this.hookManager = new HookManager();
+                this.hooks = new Dictionary<string, MethodInfo>();
+                this.Hook("HapticFeedbackControllerRumble", typeof(HapticFeedbackController).GetMethod("Rumble"), typeof(HapticFeedbackControllerDetours).GetMethod("Rumble"));
+            }
+
+            public void UnHookAll() 
+            {
+                foreach (string key in this.hooks.Keys)
+                    this.UnHook(key);
+            }
+
+            private bool Hook(string key, MethodInfo target, MethodInfo hook) 
+            {
+                if (this.hooks.ContainsKey(key))
+                    return false;
+                try 
+                {
+                    this.hooks.Add(key, target);
+                    this.hookManager.Hook(target, hook);
+                    Console.WriteLine($"{key} hooked!");
+                    return true;
+                }
+                catch (Win32Exception ex) 
+                {
+                    Console.WriteLine($"Unrecoverable Windows API error: {(object)ex}");
+                    return false;
+                }
+                catch (Exception ex) 
+                {
+                    Console.WriteLine($"Unable to hook method, : {(object)ex}");
+                    return false;
+                }
+            }
+
+            private bool UnHook(string key) 
+            {
+                MethodInfo original;
+                if (!this.hooks.TryGetValue(key, out original))
+                    return false;
+                this.hookManager.Unhook(original);
+                return true;
             }
         }
     }
