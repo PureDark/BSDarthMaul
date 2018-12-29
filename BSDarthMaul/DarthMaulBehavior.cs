@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.XR;
@@ -12,7 +13,8 @@ namespace BSDarthMaul
     public class DarthMaulBehavior : MonoBehaviour
     {
         private PlayerController _playerController;
-        private MainGameSceneSetupData _mainGameSceneSetupData;
+        private GameplayCoreSceneSetup _gameplayCoreSceneSetup;
+        private StandardLevelSceneSetupDataSO levelSetup;
 
         private Transform _head;
         private Vector3 lastLeftPos = new Vector3(0, 0, 0);
@@ -43,19 +45,20 @@ namespace BSDarthMaul
                 hapticFeedbackHooks = new HapticFeedbackHooks();
                 hapticFeedbackHooks.StartHooking();
 
-                var _mainGameSceneSetup = FindObjectOfType<MainGameSceneSetup>();
-                _mainGameSceneSetupData = ReflectionUtil.GetPrivateField<MainGameSceneSetupData>(_mainGameSceneSetup, "_mainGameSceneSetupData");
+                //var _mainGameSceneSetup = FindObjectOfType<MainGameSceneSetup>();
+                //_mainGameSceneSetupData = ReflectionUtil.GetPrivateField<MainGameSceneSetupData>(_mainGameSceneSetup, "_mainGameSceneSetupData");
+                levelSetup = Resources.FindObjectsOfTypeAll<StandardLevelSceneSetupDataSO>().FirstOrDefault();
 
-                if (Plugin.IsDarthModeOn && _mainGameSceneSetupData.gameplayMode == GameplayMode.SoloNoArrows)
-                {
-                    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(_mainGameSceneSetup, "_beatmapDataModel");
-                    var beatmapData = CreateTransformedBeatmapData(_mainGameSceneSetupData.difficultyLevel.beatmapData, _mainGameSceneSetupData.gameplayOptions, _mainGameSceneSetupData.gameplayMode);
-                    if (beatmapData != null)
-                    {
-                        _beatmapDataModel.beatmapData = beatmapData;
-                        ReflectionUtil.SetPrivateField(_mainGameSceneSetup, "_beatmapDataModel", _beatmapDataModel);
-                    }
-                }
+                //if (Plugin.IsDarthModeOn && _mainGameSceneSetupData.gameplayMode == GameplayMode.SoloNoArrows)
+                //{
+                //    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(_mainGameSceneSetup, "_beatmapDataModel");
+                //    var beatmapData = CreateTransformedBeatmapData(_mainGameSceneSetupData.difficultyLevel.beatmapData, _mainGameSceneSetupData.gameplayOptions, _mainGameSceneSetupData.gameplayMode);
+                //    if (beatmapData != null)
+                //    {
+                //        _beatmapDataModel.beatmapData = beatmapData;
+                //        ReflectionUtil.SetPrivateField(_mainGameSceneSetup, "_beatmapDataModel", _beatmapDataModel);
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -71,7 +74,7 @@ namespace BSDarthMaul
                     return;
                 }
 
-                if (isAutoDetect && !_mainGameSceneSetupData.gameplayOptions.validForScoreUse 
+                if (isAutoDetect && levelSetup.gameplayCoreSetupData.gameplayModifiers.noFail
                     && (Input.GetKey((KeyCode)ConInput.Vive.LeftTrigger) || Input.GetKey((KeyCode)ConInput.Vive.RightTrigger)))
                 {
                     Vector3 leftHandPos = InputTracking.GetLocalPosition(XRNode.LeftHand);
@@ -126,29 +129,30 @@ namespace BSDarthMaul
                     {
                         if(mainController == ControllerType.LEFT)
                         {
-                            _playerController.rightSaber.transform.parent.transform.localPosition = _playerController.leftSaber.transform.parent.transform.localPosition;
-                            _playerController.rightSaber.transform.parent.transform.localRotation = _playerController.leftSaber.transform.parent.transform.localRotation;
-                            _playerController.rightSaber.transform.parent.transform.Rotate(0, 180, 180);
-                            _playerController.rightSaber.transform.parent.transform.Translate(0, 0, sep * 2, Space.Self);
+                            _playerController.rightSaber.transform.localPosition = _playerController.leftSaber.transform.localPosition;
+                            _playerController.rightSaber.transform.localRotation = _playerController.leftSaber.transform.localRotation;
+                            _playerController.rightSaber.transform.Rotate(0, 180, 180);
+                            _playerController.rightSaber.transform.Translate(0, 0, sep * 2, Space.Self);
                         }
                         else
                         {
-                            _playerController.leftSaber.transform.parent.transform.localPosition = _playerController.rightSaber.transform.parent.transform.localPosition;
-                            _playerController.leftSaber.transform.parent.transform.localRotation = _playerController.rightSaber.transform.parent.transform.localRotation;
-                            _playerController.leftSaber.transform.parent.transform.Rotate(0, 180, 180);
-                            _playerController.leftSaber.transform.parent.transform.Translate(0, 0, sep * 2, Space.Self);
+                            _playerController.leftSaber.transform.localPosition = _playerController.rightSaber.transform.localPosition;
+                            _playerController.leftSaber.transform.localRotation = _playerController.rightSaber.transform.localRotation;
+                            _playerController.leftSaber.transform.Rotate(0, 180, 180);
+                            _playerController.leftSaber.transform.Translate(0, 0, sep * 2, Space.Self);
                         }
                     }
                     else
                     {
-                        Vector3 leftHandPos = _playerController.leftSaber.transform.parent.position;
-                        Vector3 rightHandPos = _playerController.rightSaber.transform.parent.position;
+                        Vector3 leftHandPos = _playerController.leftSaber.transform.position;
+                        Vector3 rightHandPos = _playerController.rightSaber.transform.position;
                         Vector3 middlePos = (rightHandPos + leftHandPos) * 0.5f;
                         Vector3 forward = (rightHandPos - leftHandPos).normalized;
-                        _playerController.rightSaber.transform.parent.transform.position = middlePos + forward * sep;
-                        _playerController.rightSaber.transform.parent.transform.rotation = Quaternion.LookRotation(forward, _playerController.rightSaber.transform.parent.transform.up);
-                        _playerController.leftSaber.transform.parent.transform.position = middlePos + -forward * sep;
-                        _playerController.leftSaber.transform.parent.transform.rotation = Quaternion.LookRotation(-forward, _playerController.rightSaber.transform.parent.transform.up);
+                        _playerController.rightSaber.transform.position = middlePos + forward * sep;
+                        _playerController.rightSaber.transform.rotation = Quaternion.LookRotation(forward, _playerController.rightSaber.transform.up);
+                        _playerController.leftSaber.transform.position = middlePos + -forward * sep;
+                        _playerController.leftSaber.transform.rotation = Quaternion.LookRotation(-forward, _playerController.rightSaber.transform.up);
+                        //Console.WriteLine("leftHandPos:" + leftHandPos);
                     }
                 }
             }
@@ -162,36 +166,36 @@ namespace BSDarthMaul
             hapticFeedbackHooks.UnHookAll();
         }
 
-        public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, GameplayOptions gameplayOptions, GameplayMode gameplayMode)
-        {
-            BeatmapData beatmapData2 = beatmapData;
-            if (gameplayOptions.mirror)
-            {
-                beatmapData2 = BeatDataMirrorTransform.CreateTransformedData(beatmapData2);
-            }
-            if (gameplayMode == GameplayMode.SoloNoArrows)
-            {
-                beatmapData2 = BeatmapDataNoArrowsTransform.CreateTransformedData(beatmapData2);
-            }
-            if (gameplayOptions.obstaclesOption != GameplayOptions.ObstaclesOption.All)
-            {
-                beatmapData2 = BeatmapDataObstaclesTransform.CreateTransformedData(beatmapData2, gameplayOptions.obstaclesOption);
-            }
-            if (beatmapData2 == beatmapData)
-            {
-                beatmapData2 = beatmapData.GetCopy();
-            }
-            if (gameplayOptions.staticLights)
-            {
-                BeatmapEventData[] beatmapEventData = new BeatmapEventData[]
-                {
-                new BeatmapEventData(0f, BeatmapEventType.Event0, 1),
-                new BeatmapEventData(0f, BeatmapEventType.Event4, 1)
-                };
-                beatmapData2 = new BeatmapData(beatmapData2.beatmapLinesData, beatmapEventData);
-            }
-            return beatmapData2;
-        }
+        //public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, GameplayOptions gameplayOptions, GameplayMode gameplayMode)
+        //{
+        //    BeatmapData beatmapData2 = beatmapData;
+        //    if (gameplayOptions.mirror)
+        //    {
+        //        beatmapData2 = BeatDataMirrorTransform.CreateTransformedData(beatmapData2);
+        //    }
+        //    if (gameplayMode == GameplayMode.SoloNoArrows)
+        //    {
+        //        beatmapData2 = BeatmapDataNoArrowsTransform.CreateTransformedData(beatmapData2);
+        //    }
+        //    if (gameplayOptions.obstaclesOption != GameplayOptions.ObstaclesOption.All)
+        //    {
+        //        beatmapData2 = BeatmapDataObstaclesTransform.CreateTransformedData(beatmapData2, gameplayOptions.obstaclesOption);
+        //    }
+        //    if (beatmapData2 == beatmapData)
+        //    {
+        //        beatmapData2 = beatmapData.GetCopy();
+        //    }
+        //    if (gameplayOptions.staticLights)
+        //    {
+        //        BeatmapEventData[] beatmapEventData = new BeatmapEventData[]
+        //        {
+        //        new BeatmapEventData(0f, BeatmapEventType.Event0, 1),
+        //        new BeatmapEventData(0f, BeatmapEventType.Event4, 1)
+        //        };
+        //        beatmapData2 = new BeatmapData(beatmapData2.beatmapLinesData, beatmapEventData);
+        //    }
+        //    return beatmapData2;
+        //}
 
         public void ToggleDarthMode()
         {

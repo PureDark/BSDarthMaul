@@ -7,20 +7,20 @@ using UnityEngine.SceneManagement;
 
 namespace BSDarthMaul
 {
-	public class Plugin : IEnhancedPlugin, IPlugin
+	public class Plugin : IPlugin
 	{
         public static string PluginName = "Darth Maul Plugin";
-        public const string VersionNum = "0.4.0";
+        public const string VersionNum = "0.5.0";
 
         public string Name => PluginName;
         public string Version => VersionNum;
 
         private static Plugin _instance;
         
-        private static PanelBehavior panelBehavior;
+        //private static PanelBehavior panelBehavior;
         private static DarthMaulBehavior darthMaulBehavior;
 
-        private static AsyncScenesLoader loader;
+        //private static AsyncScenesLoader loader;
 
         public const string KeyDarthMode = "DMDarthMode";
         public const string KeyOneHanded = "DMOneHanded";
@@ -112,8 +112,6 @@ namespace BSDarthMaul
             }
         }
 
-        public string[] Filter { get; }
-
         public void OnApplicationStart()
         {
             SceneManager.activeSceneChanged += SceneManagerOnActiveSceneChanged;
@@ -131,15 +129,17 @@ namespace BSDarthMaul
 		{
             try
             {
+                Console.WriteLine("scene.name == " + scene.name);
                 if (scene.name == "Menu")
                 {
-                    panelBehavior = new GameObject("panelBehavior").AddComponent<PanelBehavior>();
+                    //panelBehavior = new GameObject("panelBehavior").AddComponent<PanelBehavior>();
                 }
-                else if (scene.name == "StandardLevelLoader")
+                else if (scene.name == "GameCore")
                 {
-                    if (!loader)
-                        loader = Resources.FindObjectsOfTypeAll<AsyncScenesLoader>().FirstOrDefault();
-                    loader.loadingDidFinishEvent += OnLoadingDidFinishGame;
+                    //if (!loader)
+                    //    loader = Resources.FindObjectsOfTypeAll<AsyncScenesLoader>().FirstOrDefault();
+                    //loader.loadingDidFinishEvent += OnLoadingDidFinishGame;
+                    OnLoadingDidFinishGame();
                 }
             }
             catch (Exception ex)
