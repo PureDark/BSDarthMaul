@@ -11,9 +11,10 @@ namespace BSDarthMaul
     {
         public static BeatmapData CreateTransformedData(BeatmapData beatmapData)
         {
+            Console.WriteLine("Transforming");
             bool isDarthModeOn = Plugin.IsDarthModeOn;
             int randLevel = Plugin.NoArrowRandLv;
-            beatmapData = beatmapData.GetCopy();
+            
             BeatmapLineData[] beatmapLinesData = beatmapData.beatmapLinesData;
             int[] array = new int[beatmapLinesData.Length];
             for (int i = 0; i < array.Length; i++)

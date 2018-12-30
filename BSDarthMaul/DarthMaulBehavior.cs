@@ -48,17 +48,22 @@ namespace BSDarthMaul
                 //var _mainGameSceneSetup = FindObjectOfType<MainGameSceneSetup>();
                 //_mainGameSceneSetupData = ReflectionUtil.GetPrivateField<MainGameSceneSetupData>(_mainGameSceneSetup, "_mainGameSceneSetupData");
                 levelSetup = Resources.FindObjectsOfTypeAll<StandardLevelSceneSetupDataSO>().FirstOrDefault();
+                GameplayCoreSceneSetup gameplayCoreSceneSetup = Resources.FindObjectsOfTypeAll<GameplayCoreSceneSetup>().First();
 
-                //if (Plugin.IsDarthModeOn && _mainGameSceneSetupData.gameplayMode == GameplayMode.SoloNoArrows)
-                //{
-                //    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(_mainGameSceneSetup, "_beatmapDataModel");
-                //    var beatmapData = CreateTransformedBeatmapData(_mainGameSceneSetupData.difficultyLevel.beatmapData, _mainGameSceneSetupData.gameplayOptions, _mainGameSceneSetupData.gameplayMode);
-                //    if (beatmapData != null)
-                //    {
-                //        _beatmapDataModel.beatmapData = beatmapData;
-                //        ReflectionUtil.SetPrivateField(_mainGameSceneSetup, "_beatmapDataModel", _beatmapDataModel);
-                //    }
-                //}
+                // For now just check for practice mode 
+
+                if (Plugin.IsDarthModeOn && levelSetup.gameplayCoreSetupData.practiceSettings != null)
+                {
+                   var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(gameplayCoreSceneSetup, "_beatmapDataModel");
+                    var beatmapData = CreateTransformedBeatmapData(levelSetup.difficultyBeatmap.beatmapData.GetCopy(), levelSetup);
+                    if (beatmapData != null)
+                    {
+                        _beatmapDataModel.beatmapData = beatmapData;
+                    
+                    }
+                }
+
+    
             }
             catch (Exception ex)
             {
@@ -166,36 +171,24 @@ namespace BSDarthMaul
             hapticFeedbackHooks.UnHookAll();
         }
 
-        //public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, GameplayOptions gameplayOptions, GameplayMode gameplayMode)
-        //{
-        //    BeatmapData beatmapData2 = beatmapData;
-        //    if (gameplayOptions.mirror)
-        //    {
-        //        beatmapData2 = BeatDataMirrorTransform.CreateTransformedData(beatmapData2);
-        //    }
-        //    if (gameplayMode == GameplayMode.SoloNoArrows)
-        //    {
-        //        beatmapData2 = BeatmapDataNoArrowsTransform.CreateTransformedData(beatmapData2);
-        //    }
-        //    if (gameplayOptions.obstaclesOption != GameplayOptions.ObstaclesOption.All)
-        //    {
-        //        beatmapData2 = BeatmapDataObstaclesTransform.CreateTransformedData(beatmapData2, gameplayOptions.obstaclesOption);
-        //    }
-        //    if (beatmapData2 == beatmapData)
-        //    {
-        //        beatmapData2 = beatmapData.GetCopy();
-        //    }
-        //    if (gameplayOptions.staticLights)
-        //    {
-        //        BeatmapEventData[] beatmapEventData = new BeatmapEventData[]
-        //        {
-        //        new BeatmapEventData(0f, BeatmapEventType.Event0, 1),
-        //        new BeatmapEventData(0f, BeatmapEventType.Event4, 1)
-        //        };
-        //        beatmapData2 = new BeatmapData(beatmapData2.beatmapLinesData, beatmapEventData);
-        //    }
-        //    return beatmapData2;
-        //}
+        public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, StandardLevelSceneSetupDataSO levelSetup)
+        {
+            BeatmapData beatmapData2 = beatmapData;
+            
+            if (selectedCharacteristic == "No Arrows")
+            {
+                beatmapData2 = BeatmapDataNoArrowsTransform.CreateTransformedData(beatmapData2);
+            }
+            //This covers all of the modifiers and player settings that were here previously
+            beatmapData2 = BeatDataTransformHelper.CreateTransformedBeatmapData(beatmapData2, levelSetup.gameplayCoreSetupData.gameplayModifiers, levelSetup.gameplayCoreSetupData.practiceSettings, levelSetup.gameplayCoreSetupData.playerSpecificSettings);
+
+            if (beatmapData2 == beatmapData)
+            {
+                beatmapData2 = beatmapData.GetCopy();
+            }
+
+            return beatmapData2;
+        }
 
         public void ToggleDarthMode()
         {

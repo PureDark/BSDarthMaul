@@ -16,7 +16,10 @@ namespace BSDarthMaul
         public string Version => VersionNum;
 
         private static Plugin _instance;
-        
+
+        // Characteristic controller to check what the current mode is
+        private BeatmapCharacteristicSelectionViewController _characteristicViewController;
+        public static string selectedCharacteristic = "Standard";
         //private static PanelBehavior panelBehavior;
         private static DarthMaulBehavior darthMaulBehavior;
 
@@ -115,11 +118,18 @@ namespace BSDarthMaul
         public void OnApplicationStart()
         {
             SceneManager.activeSceneChanged += SceneManagerOnActiveSceneChanged;
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             CheckForUserDataFolder();
             _instance = this;
         }
 
-		public void OnApplicationQuit()
+        private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode arg1)
+        {
+            if(scene.name == "Menu")
+            DarthMaulUI.CreateUI();
+        }
+
+        public void OnApplicationQuit()
 		{
             SceneManager.activeSceneChanged -= SceneManagerOnActiveSceneChanged;
             _instance = null;
@@ -132,14 +142,22 @@ namespace BSDarthMaul
                 Console.WriteLine("scene.name == " + scene.name);
                 if (scene.name == "Menu")
                 {
-                    //panelBehavior = new GameObject("panelBehavior").AddComponent<PanelBehavior>();
-                }
-                else if (scene.name == "GameCore")
+                    if (_characteristicViewController == null)
+                    {
+                        _characteristicViewController = Resources.FindObjectsOfTypeAll<BeatmapCharacteristicSelectionViewController>().FirstOrDefault();
+                        if (_characteristicViewController == null) return;
+                        _characteristicViewController.didSelectBeatmapCharacteristicEvent += _characteristicViewController_didSelectBeatmapCharacteristicEvent;
+                    }
+
+
+                        //panelBehavior = new GameObject("panelBehavior").AddComponent<PanelBehavior>();
+                    }
+                    else if (scene.name == "GameCore")
                 {
                     //if (!loader)
                     //    loader = Resources.FindObjectsOfTypeAll<AsyncScenesLoader>().FirstOrDefault();
                     //loader.loadingDidFinishEvent += OnLoadingDidFinishGame;
-                    OnLoadingDidFinishGame();
+                    SharedCoroutineStarter.instance.StartCoroutine(OnLoadingDidFinishGame());
                 }
             }
             catch (Exception ex)
@@ -148,8 +166,16 @@ namespace BSDarthMaul
             }
         }
 
-        public void OnLoadingDidFinishGame()
+        private void _characteristicViewController_didSelectBeatmapCharacteristicEvent(BeatmapCharacteristicSelectionViewController arg1, BeatmapCharacteristicSO characteristic)
         {
+            //  Standard, One Saber, No Arrows
+
+            selectedCharacteristic = characteristic.characteristicName;
+        }
+
+        public static System.Collections.IEnumerator OnLoadingDidFinishGame()
+        {
+            yield return new WaitForSeconds(0.1f);
             darthMaulBehavior = new GameObject("DarthMaulBehavior").AddComponent<DarthMaulBehavior>();
         }
 
