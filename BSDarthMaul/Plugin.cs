@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using Harmony;
 namespace BSDarthMaul
 {
 	public class Plugin : IPlugin
@@ -16,7 +16,7 @@ namespace BSDarthMaul
         public string Version => VersionNum;
 
         private static Plugin _instance;
-
+        private static bool patched;
         // Characteristic controller to check what the current mode is
         private BeatmapCharacteristicSelectionViewController _characteristicViewController;
         public static string selectedCharacteristic = "Standard";
@@ -32,6 +32,7 @@ namespace BSDarthMaul
         public const string KeyAutoDetect = "DMAutoDetect";
         public const string KeyNoArrowRandLv = "DMNoArrowRandLv";
 
+        public static HarmonyInstance harmony;
         public static bool IsDarthModeOn
         {
             get
@@ -121,6 +122,7 @@ namespace BSDarthMaul
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             CheckForUserDataFolder();
             _instance = this;
+            harmony = HarmonyInstance.Create("com.PureDark.BeatSaber.BSDarthMaul");
         }
 
         private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode arg1)
@@ -264,5 +266,26 @@ namespace BSDarthMaul
         public void OnFixedUpdate()
 		{
 		}
-	}
+
+        public static void ApplyPatches()
+        {
+            if (!patched)
+            {
+                Console.WriteLine("Disabling Score Submission for Darth Maul Mode");
+                harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
+                patched = true;
+            }
+
+        }
+
+        public static void RemovePatches()
+        {
+            if (patched)
+            {
+                harmony.UnpatchAll("com.PureDark.BeatSaber.BSDarthMaul");
+                patched = false;
+            }
+
+        }
+    }
 }
