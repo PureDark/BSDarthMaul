@@ -33,6 +33,7 @@ namespace BSDarthMaul
         {
             try
             {
+                Plugin.RemovePatches();
                 Console.WriteLine("Darth Maul Loaded");
                 this._playerController = FindObjectOfType<PlayerController>();
                 this._head = ReflectionUtil.GetPrivateField<Transform>(_playerController, "_headTransform");
@@ -50,10 +51,10 @@ namespace BSDarthMaul
                 levelSetup = Resources.FindObjectsOfTypeAll<StandardLevelSceneSetupDataSO>().FirstOrDefault();
                 GameplayCoreSceneSetup gameplayCoreSceneSetup = Resources.FindObjectsOfTypeAll<GameplayCoreSceneSetup>().First();
 
-                // For now just check for practice mode 
 
-                if (Plugin.IsDarthModeOn && levelSetup.gameplayCoreSetupData.practiceSettings != null)
+                if (Plugin.IsDarthModeOn)
                 {
+                    Plugin.ApplyPatches();
                    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(gameplayCoreSceneSetup, "_beatmapDataModel");
                     var beatmapData = CreateTransformedBeatmapData(levelSetup.difficultyBeatmap.beatmapData.GetCopy(), levelSetup);
                     if (beatmapData != null)
