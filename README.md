@@ -26,14 +26,14 @@ DMNoArrowRandLv=2
 ```
 
 # Leaderboards
-Turnning on Darh Maul Mode results in a separated leaderboard. 1 hand & 2 hand mode will have different leaderboards .
+Turnning on Darth Maul Mode results in a separated leaderboard. 1 hand & 2 hand mode will have different leaderboards .
 
 AutoDetect now only works in no-fail/party mode for this particular reason.
 
 It's compatible with HiddenBlocks, meaning 
-* DarhMaulMode on is one leaderborad.
+* DarthMaulMode on is one leaderborad.
 * HiddenBlocks on is another.
-* DarhMaulMode and HiddenBlocks both on yet another brand-new leaderboard.
+* DarthMaulMode and HiddenBlocks both on yet another brand-new leaderboard.
 
 
 # Downloads
