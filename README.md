@@ -24,7 +24,6 @@ DMMainController=1
 # 0 - no random, 1 - only randomize loners, 2 - default value used by game. randomize lines with 2 or less blocks.
 DMNoArrowRandLv=2
 ```
-
 Score Submission will be disabled if Darth Maul is activated
 
 # Downloads
