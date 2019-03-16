@@ -166,7 +166,7 @@ namespace BSDarthMaul
                 Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
             }
         }
-
+        
         void OnDestroy() {
             hapticFeedbackHooks.UnHookAll();
         }
