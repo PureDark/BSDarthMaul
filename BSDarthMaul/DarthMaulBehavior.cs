@@ -14,7 +14,7 @@ namespace BSDarthMaul
     {
         private PlayerController _playerController;
         private GameplayCoreSceneSetup _gameplayCoreSceneSetup;
-        private BS_Utils.Gameplay.LevelData levelSetup;
+        private StandardLevelSceneSetupDataSO levelSetup;
 
         private Transform _head;
         private Vector3 lastLeftPos = new Vector3(0, 0, 0);
@@ -33,6 +33,7 @@ namespace BSDarthMaul
         {
             try
             {
+                Plugin.RemovePatches();
                 Console.WriteLine("Darth Maul Loaded");
                 this._playerController = FindObjectOfType<PlayerController>();
                 this._head = ReflectionUtil.GetPrivateField<Transform>(_playerController, "_headTransform");
@@ -47,15 +48,15 @@ namespace BSDarthMaul
 
                 //var _mainGameSceneSetup = FindObjectOfType<MainGameSceneSetup>();
                 //_mainGameSceneSetupData = ReflectionUtil.GetPrivateField<MainGameSceneSetupData>(_mainGameSceneSetup, "_mainGameSceneSetupData");
-                levelSetup = BS_Utils.Plugin.LevelData;
+                levelSetup = Resources.FindObjectsOfTypeAll<StandardLevelSceneSetupDataSO>().FirstOrDefault();
                 GameplayCoreSceneSetup gameplayCoreSceneSetup = Resources.FindObjectsOfTypeAll<GameplayCoreSceneSetup>().First();
 
 
                 if (Plugin.IsDarthModeOn)
                 {
-                    BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("Darth Maul");
-                    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(gameplayCoreSceneSetup, "_beatmapDataModel");
-                    var beatmapData = CreateTransformedBeatmapData(levelSetup.GameplayCoreSceneSetupData.difficultyBeatmap.beatmapData.GetCopy(), levelSetup);
+                    Plugin.ApplyPatches();
+                   var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(gameplayCoreSceneSetup, "_beatmapDataModel");
+                    var beatmapData = CreateTransformedBeatmapData(levelSetup.difficultyBeatmap.beatmapData.GetCopy(), levelSetup);
                     if (beatmapData != null)
                     {
                         _beatmapDataModel.beatmapData = beatmapData;
@@ -79,7 +80,7 @@ namespace BSDarthMaul
                     return;
                 }
 
-                if (isAutoDetect && levelSetup.GameplayCoreSceneSetupData.gameplayModifiers.noFail
+                if (isAutoDetect && levelSetup.gameplayCoreSetupData.gameplayModifiers.noFail
                     && (Input.GetKey((KeyCode)ConInput.Vive.LeftTrigger) || Input.GetKey((KeyCode)ConInput.Vive.RightTrigger)))
                 {
                     Vector3 leftHandPos = InputTracking.GetLocalPosition(XRNode.LeftHand);
@@ -171,16 +172,16 @@ namespace BSDarthMaul
             hapticFeedbackHooks.UnHookAll();
         }
 
-        public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, BS_Utils.Gameplay.LevelData levelSetup)
+        public static BeatmapData CreateTransformedBeatmapData(BeatmapData beatmapData, StandardLevelSceneSetupDataSO levelSetup)
         {
             BeatmapData beatmapData2 = beatmapData;
             
-            if (BS_Utils.Gameplay.Gamemode.GameMode == "No Arrows")
+            if (selectedCharacteristic == "No Arrows")
             {
                 beatmapData2 = BeatmapDataNoArrowsTransform.CreateTransformedData(beatmapData2);
             }
             //This covers all of the modifiers and player settings that were here previously
-            beatmapData2 = BeatDataTransformHelper.CreateTransformedBeatmapData(beatmapData2, levelSetup.GameplayCoreSceneSetupData.gameplayModifiers, levelSetup.GameplayCoreSceneSetupData.practiceSettings, levelSetup.GameplayCoreSceneSetupData.playerSpecificSettings);
+            beatmapData2 = BeatDataTransformHelper.CreateTransformedBeatmapData(beatmapData2, levelSetup.gameplayCoreSetupData.gameplayModifiers, levelSetup.gameplayCoreSetupData.practiceSettings, levelSetup.gameplayCoreSetupData.playerSpecificSettings);
 
             if (beatmapData2 == beatmapData)
             {

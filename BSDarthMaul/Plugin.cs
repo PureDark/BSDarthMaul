@@ -18,6 +18,8 @@ namespace BSDarthMaul
         private static Plugin _instance;
         private static bool patched;
         // Characteristic controller to check what the current mode is
+        private BeatmapCharacteristicSelectionViewController _characteristicViewController;
+        public static string selectedCharacteristic = "Standard";
         //private static PanelBehavior panelBehavior;
         private static DarthMaulBehavior darthMaulBehavior;
 
@@ -125,7 +127,7 @@ namespace BSDarthMaul
 
         private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode arg1)
         {
-            if(scene.name == "MenuCore")
+            if(scene.name == "Menu")
             DarthMaulUI.CreateUI();
         }
 
@@ -140,8 +142,16 @@ namespace BSDarthMaul
             try
             {
                 Console.WriteLine("scene.name == " + scene.name);
-                if (scene.name == "MenuCore")
+                if (scene.name == "Menu")
                 {
+                    if (_characteristicViewController == null)
+                    {
+                        _characteristicViewController = Resources.FindObjectsOfTypeAll<BeatmapCharacteristicSelectionViewController>().FirstOrDefault();
+                        if (_characteristicViewController == null) return;
+                        _characteristicViewController.didSelectBeatmapCharacteristicEvent += _characteristicViewController_didSelectBeatmapCharacteristicEvent;
+                    }
+
+
                         //panelBehavior = new GameObject("panelBehavior").AddComponent<PanelBehavior>();
                     }
                     else if (scene.name == "GameCore")
@@ -156,6 +166,13 @@ namespace BSDarthMaul
             {
                 Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
             }
+        }
+
+        private void _characteristicViewController_didSelectBeatmapCharacteristicEvent(BeatmapCharacteristicSelectionViewController arg1, BeatmapCharacteristicSO characteristic)
+        {
+            //  Standard, One Saber, No Arrows
+
+            selectedCharacteristic = characteristic.characteristicName;
         }
 
         public static System.Collections.IEnumerator OnLoadingDidFinishGame()
@@ -250,6 +267,25 @@ namespace BSDarthMaul
 		{
 		}
 
+        public static void ApplyPatches()
+        {
+            if (!patched)
+            {
+                Console.WriteLine("Disabling Score Submission for Darth Maul Mode");
+                harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
+                patched = true;
+            }
 
+        }
+
+        public static void RemovePatches()
+        {
+            if (patched)
+            {
+                harmony.UnpatchAll("com.PureDark.BeatSaber.BSDarthMaul");
+                patched = false;
+            }
+
+        }
     }
 }
