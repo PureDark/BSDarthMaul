@@ -1,4 +1,4 @@
-# Darth Maul Plugin v0.4.0
+# Darth Maul Plugin v0.6.0
 
 * Darth Maul mode
 * One controller support
@@ -24,17 +24,7 @@ DMMainController=1
 # 0 - no random, 1 - only randomize loners, 2 - default value used by game. randomize lines with 2 or less blocks.
 DMNoArrowRandLv=2
 ```
-
-# Leaderboards
-Turnning on Darth Maul Mode results in a separated leaderboard. 1 hand & 2 hand mode will have different leaderboards .
-
-AutoDetect now only works in no-fail/party mode for this particular reason.
-
-It's compatible with HiddenBlocks, meaning 
-* DarthMaulMode on is one leaderborad.
-* HiddenBlocks on is another.
-* DarthMaulMode and HiddenBlocks both on yet another brand-new leaderboard.
-
+Score Submission will be disabled if Darth Maul is activated
 
 # Downloads
-[ModSaber](https://www.modsaber.ml/mod/darthmaul/0.4.0)
+[ModSaber](https://www.modsaber.org/mod/darthmaul/)
