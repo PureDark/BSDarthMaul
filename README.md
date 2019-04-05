@@ -8,7 +8,8 @@
 
 # Configuration
 
-Run the game once to generate the settings, they are in Beat Saber/UserData/modprefs.ini.
+- Run the game once to generate the settings, they are in Beat Saber/UserData/modprefs.ini.
+- You can Toggle Darth Maul and other settings in the Gameplay Modifiers Panel on the left when selecting songs
 
 ```ini
 [Darth Maul Plugin]
