@@ -13,7 +13,6 @@ namespace BSDarthMaul
     public class DarthMaulBehavior : MonoBehaviour
     {
         private PlayerController _playerController;
-        private GameplayCoreSceneSetup _gameplayCoreSceneSetup;
         private BS_Utils.Gameplay.LevelData levelSetup;
 
         private Transform _head;
@@ -54,13 +53,13 @@ namespace BSDarthMaul
                 if (Plugin.IsDarthModeOn)
                 {
                     BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("Darth Maul");
-                    var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(gameplayCoreSceneSetup, "_beatmapDataModel");
-                    var beatmapData = CreateTransformedBeatmapData(levelSetup.GameplayCoreSceneSetupData.difficultyBeatmap.beatmapData.GetCopy(), levelSetup);
-                    if (beatmapData != null)
-                    {
-                        _beatmapDataModel.beatmapData = beatmapData;
+                    //var _beatmapDataModel = ReflectionUtil.GetPrivateField<BeatmapDataModel>(gameplayCoreSceneSetup, "_beatmapDataModel");
+                    //var beatmapData = CreateTransformedBeatmapData(levelSetup.GameplayCoreSceneSetupData.difficultyBeatmap.beatmapData.GetCopy(), levelSetup);
+                    //if (beatmapData != null)
+                    //{
+                    //    _beatmapDataModel.beatmapData = beatmapData;
                     
-                    }
+                    //}
                 }
 
     

@@ -13,7 +13,7 @@ namespace BSDarthMaul
 
         public static void Rumble(HapticFeedbackController t, XRNode node, float duration, float impulseStrength, float intervalDuration) 
         {
-            if (!ReflectionUtil.GetPrivateField<MainSettingsModel>(t, "_mainSettingsModel").controllersRumbleEnabled) 
+            if (!ReflectionUtil.GetPrivateField<BoolSO>(t, "_controllersRumbleEnabled").value) 
             {
                 return;
             }
